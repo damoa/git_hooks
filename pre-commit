@@ -1,0 +1,63 @@
+#!/bin/bash
+
+# Get staged JS/JSX files
+JS_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(js|jsx)$')
+
+if [ -n "$JS_FILES" ]; then
+  echo 'Checking ESLint...'
+
+  npx eslint $JS_FILES
+
+  if [ $? -ne 0 ]; then
+    read -r -p "ESLint failed. Do you want me to apply auto fixes? [y/N] " answer </dev/tty
+    case "$answer" in
+      [Yy]* )
+        npx eslint --fix $JS_FILES
+        "ESLint fixes applied. Please commit the fixed changes and try again."
+        exit 1
+        ;;
+      * )
+        read -r -p "Do you want to commit without ESLint fixing? [y/N] " answer2 </dev/tty
+        case "$answer2" in
+          [Yy]* )
+            exit 0
+            ;;
+          * )
+            echo "Please fix the errors and try committing again."
+            exit 1
+            ;;
+        esac
+    esac
+  fi
+fi
+
+# Get staged Ruby files
+RUBY_FILES=$(git diff --staged --name-only --diff-filter=d | grep '\.rb$' | grep -v 'db/schema.rb')
+
+if [ -n "$RUBY_FILES" ]; then
+  echo 'Checking Rubocop...'
+
+  bundle exec rubocop $RUBY_FILES
+
+  if [ $? -ne 0 ]; then
+    read -r -p "Rubocop failed. Do you want me to apply auto fixes? [y/N] " answer </dev/tty
+    case "$answer" in
+      [Yy]* )
+        bundle exec rubocop --fix $RUBY_FILES
+        "Rubocop fixes applied. Please commit the fixed changes and try again."
+        exit 1
+        ;;
+      * )
+        read -r -p "Do you want to commit without Rubocop fixing? [y/N] " answer2 </dev/tty
+        case "$answer2" in
+          [Yy]* )
+            exit 0
+            ;;
+          * )
+            echo "Please fix the errors and try committing again."
+            exit 1
+            ;;
+        esac
+    esac
+  fi
+fi
