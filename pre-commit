@@ -13,7 +13,7 @@ if [ -n "$JS_FILES" ]; then
     case "$answer" in
       [Yy]* )
         npx eslint --fix $JS_FILES
-        "ESLint fixes applied. Please commit the fixed changes and try again."
+        echo "ESLint fixes applied. Please commit the fixed changes and try again."
         exit 1
         ;;
       * )
@@ -44,7 +44,7 @@ if [ -n "$RUBY_FILES" ]; then
     case "$answer" in
       [Yy]* )
         bundle exec rubocop --fix $RUBY_FILES
-        "Rubocop fixes applied. Please commit the fixed changes and try again."
+        echo "Rubocop fixes applied. Please commit the fixed changes and try again."
         exit 1
         ;;
       * )
